@@ -1,0 +1,52 @@
+{
+  "name": "three-js-zindex",
+  "version": "1.0.0",
+  "description": "Z Index Manager Challenge",
+  "keywords": [
+    "threejs",
+    "three.js",
+    "z-index",
+    "performance",
+    "o(1)",
+    "linked-list",
+    "render-order",
+    "webgl",
+    "3d",
+    "canvas",
+    "optimization",
+    "algorithm",
+    "data-structures"
+  ],
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build --turbopack",
+    "start": "next start",
+    "preview": "npm run build && npm run start",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "type-check": "npx tsc --noEmit",
+    "clean": "rm -rf .next out dist node_modules/.cache",
+    "fresh-install": "npm run clean && npm install"
+  },
+  "dependencies": {
+    "@react-three/drei": "^10.7.4",
+    "@react-three/fiber": "^9.3.0",
+    "@types/three": "^0.179.0",
+    "next": "15.5.2",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "three": "^0.179.1"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3",
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "15.5.2",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
