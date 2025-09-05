@@ -25,24 +25,55 @@ export class ZIndexManager {
    * - Must achieve O(1) time complexity (constant time regardless of number of blocks)
    * - If block doesn't exist yet, create it with a fixed z-index
    * - Update visual rendering order for Three.js
-   * 
+   *
    * Constraints:
    * - Cannot use incrementing counters (leads to overflow and O(n) operations)
    * - Z-index values should remain bounded (not grow infinitely)
    * - Must work efficiently with hundreds or thousands of blocks
-   * 
+   *
    * Algorithm steps:
    * 1. Find existing node OR create new node with fixed z-index
    * 2. If node is already at front, return early
    * 3. Remove node from current position in data structure (update pointers)
    * 4. Add node to front position (update head and pointers)
    * 5. Update all render orders for Three.js
-   * 
+   *
    * @param blockId - Unique identifier for the block
    * @returns The fixed z-index value for the block
    */
   public moveToFront(blockId: string): number {
-    return 0;
+    if (this.head && this.head.blockId === blockId) {
+      return this.getZIndex(blockId);
+    }
+
+    let node = this.blockMap.get(blockId);
+
+    if (!node) {
+      node = new ZIndexNode(
+        blockId,
+        this.generateFixedZIndex(blockId),
+      );
+      this.blockMap.set(blockId, node);
+    }
+
+    if (node.prev) {
+      node.prev.next = node.next;
+    }
+    if (node.next) {
+      node.next.prev = node.prev;
+    }
+
+    if (this.head) {
+      this.head.prev = node;
+    }
+
+    node.prev = null;
+    node.next = this.head;
+    this.head = node;
+
+    this.updateRenderOrders();
+
+    return this.getZIndex(blockId);
   }
 
   /**
@@ -51,7 +82,7 @@ export class ZIndexManager {
   public getBlocksNeedingUpdate(): Array<{blockId: string, renderOrder: number}> {
     const blocks: Array<{blockId: string, renderOrder: number}> = [];
     let current = this.head;
-    
+
     while (current) {
       blocks.push({
         blockId: current.blockId,
@@ -59,7 +90,7 @@ export class ZIndexManager {
       });
       current = current.next;
     }
-    
+
     return blocks;
   }
 
@@ -79,12 +110,19 @@ export class ZIndexManager {
    * - Each subsequent block should have decreasing render order (8999, 8998, etc.)
    * - Three.js uses renderOrder property to determine draw order
    * - This bridges your ordering structure with Three.js rendering
-   * 
+   *
    * Note: This function is called after every reordering operation.
    * While it's O(n), it only runs when order changes, not on every frame.
    */
   private updateRenderOrders(): void {
-    throw new Error('Not implemented');
+    let node = this.head;
+    let renderOrder = 9000;
+    while (node) {
+      node.renderOrder = renderOrder;
+      console.log(node);
+      renderOrder--;
+      node = node.next;
+    }
 }
 
   /**
@@ -112,18 +150,18 @@ export class ZIndexManager {
   public removeBlock(blockId: string): void {
     const node = this.blockMap.get(blockId);
     if (!node) return;
-    
+
     if (node === this.head) {
       this.head = node.next;
     }
-    
+
     if (node.prev) {
       node.prev.next = node.next;
     }
     if (node.next) {
       node.next.prev = node.prev;
     }
-    
+
     this.blockMap.delete(blockId);
     this.updateRenderOrders();
   }
@@ -141,12 +179,12 @@ export class ZIndexManager {
   public getAllBlocks(): string[] {
     const blocks: string[] = [];
     let current = this.head;
-    
+
     while (current) {
       blocks.push(current.blockId);
       current = current.next;
     }
-    
+
     return blocks;
   }
 
